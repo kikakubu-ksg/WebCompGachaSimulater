@@ -1,0 +1,190 @@
+* {
+margin: 0;
+padding: 0;
+}
+
+html {width:100%;}
+
+body {
+font-family: sans-serif;
+font-size: 65%;
+background: #3e3a38;
+width:100%;
+}
+
+a:link {
+color: #3e9bd6;
+}
+
+h2 { 
+width: 507px; 
+font-size: 1.2em; 
+text-transform: lowercase; 
+height: 37px; 
+margin: 20px auto 10px auto; 
+color: #ffffff; 
+line-height: 37px; 
+color: #ffffff; 
+text-indent: 20px; 
+background: url(bar.gif) no-repeat;
+}
+
+#container { 
+width: 599px; 
+margin: 0 auto; 
+background: #ffffff;
+}
+
+#header { 
+width: 516px; 
+height: 125px; 
+background: 
+#bfd447 url(header.gif) no-repeat; 
+margin: 0 auto;
+}
+
+#content { 
+width:510px; 
+margin: 0px auto; 
+padding: 0 5px 35px 5px ;
+}
+
+#content p { 
+font-size: 1.1em; 
+color: #555555; 
+margin-left: 10px; 
+background: #ffffff; 
+margin-top: 10px; 
+line-height: 1.5em;
+}
+
+#footertext { 
+margin: 30px auto; 
+text-align: center; 
+color: #777777; 
+font-size: 1em;
+}
+
+.kao {
+color: #FFBB44;
+font-weight:bold;
+
+}
+
+
+#simcontainer { 
+width: 900px; 
+height: 500px;
+margin: 0px 10px 0px 10px; 
+background: #ffffff;
+}
+
+div.simconfig {
+float:left;
+width:120px;
+}
+
+div.simconfigmessage {
+float:left;
+width:300px;
+}
+
+div.clear{clear:both;}
+
+#simlogcontainercontainer { 
+float:left;
+}
+
+#simlogcontainer { 
+float:left;
+overflow-x: hidden;
+overflow-y: scroll;
+width: 500px; 
+height: 460px;
+margin: 0px 10px 10px 10px;
+background: #CCCCCC;
+font-size:12px;
+border:1px #000000 solid;
+}
+
+#simlogheader{
+margin: 10px 10px 0px 10px;
+
+}
+
+
+#simtable { 
+float:left;
+overflow-x: hidden;
+overflow-y: hidden;
+width: 350px; 
+height: 460px;
+margin: 10px 10px 10px 10px;
+background: #FFFFFF;
+}
+
+#resulttable{
+border: 2px #000000 solid;
+border-collapse: collapse;
+width: 330px; 
+height: 330px;
+empty-cells: show;
+}
+
+#resulttable th,td{
+border: 1px #000000 solid;
+padding:0;
+width: 30px; 
+height: 30px;
+text-align:center;
+valign:middle;
+}
+
+#resulttable th {
+background-color:#AAAAFF;
+color:#FFFFFF;
+}
+
+td.colheader {
+background-color:#AAAAFF;
+color:#FFFFFF;
+font-weight:bold;
+}
+
+.log1{
+background-color:#FFCCCC;
+border-bottom:1px #000000 solid;
+float:left;
+width:70px;
+text-align:right;
+}
+
+.log2{
+background-color:#FFFFFF;
+border-bottom:1px #000000 solid;
+float:left;
+width:300px;
+
+}
+
+.log3{
+background-color:#CCFFCC;
+border-bottom:1px #000000 solid;float:left;
+width:100px;
+text-align:right;
+
+}
+
+#hid{
+
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+margin:-100px 0 0 -50px;
+width:300px;
+  text-align:center;
+  background-color:#FFFFFF;
+  z-index:10;
+
+}

@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>コンプガチャシミュレッター</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="images/style.css" />
+<script type="text/javascript" src="js/jquery.js"></script>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+<script type="text/javascript">
+<!--
+//初期処理
+//グローバル変数
+var limit=100;
+var timerID;
+var mt;
+
+var simcount=0;
+var pay=0;
+var normalcard=0;
+var rarecard=0;
+
+var c_num;
+var price;
+var r_num;
+var r_pr;
+
+var array_r; //rare
+var array_n; //normal
+var array_a; //all
+
+var rare_comp=false;
+var normal_comp=false;
+var all_comp=false;
+
+var toggle=0;
+
+
+$(function(){
+//ボタンクリック時動作
+$("#startbutton").click(function () {
+  $("#startbutton").attr("disabled","disabled");
+  $("#gacha").attr("disabled",null);
+  $("#auto").attr("disabled",null);
+  
+  $("*[name=c_num]").attr("disabled","disabled");
+  $("*[name=price]").attr("disabled","disabled");
+  $("*[name=r_num]").attr("disabled","disabled");
+  $("*[name=r_pr]").attr("disabled","disabled");
+  $("*[name=exe]").attr("disabled","disabled");
+
+  //初期化処理
+  //コンフィグ値保存（面倒なので）
+  c_num=$("*[name=c_num]").val();
+  price=$("*[name=price]").val();
+  r_num=$("*[name=r_num]").val();
+  r_pr=$("*[name=r_pr]").val();
+  
+  //配列生成
+  array_r=new Array(c_num);
+  array_n=new Array(c_num);
+  array_a=new Array(c_num);
+  
+  $("#resulttable td:not(.colheader)").css("background-color","#666666");
+  for (i = 0; i < c_num; i++) {
+    array_a[i]=1;
+    if(c_num-r_num <= i){
+      array_r[i]=1;
+      array_n[i]=0;
+      $("#resulttable td:not(.colheader)").eq(i).css("background-color","#FFEEEE");
+    }
+    else
+    {
+      array_r[i]=0;
+      array_n[i]=1;
+      $("#resulttable td:not(.colheader)").eq(i).css("background-color","#FFFFFF");
+    }
+  }
+  
+  
+
+});
+
+
+// ガチャ
+$("#auto").click(function(){
+  if(!toggle){
+    $("#auto").text('ストップ！');
+    mt = parseInt($("*[name=exe]").val());
+    mt = Math.floor(1000/mt);
+    timerID=setInterval("lot()",mt);
+	toggle=1;
+  }
+  else{
+    $("#auto").text('自動で実行！');
+    clearInterval(timerID);
+	toggle=0;
+  }
+
+});
+
+$("#gacha").click(function () {
+  lot();
+
+});
+
+// クリアー
+$("#clearbutton").click(function () {
+  for (i = 0; i < limit; i++) {
+    $("#resulttable td:not(.colheader)").eq(i).css("background-color","#FFFFFF");
+    $("#resulttable td:not(.colheader)").eq(i).text("");
+    $("#simlogcontainer").html("");
+  }
+  
+  simcount=0;
+  pay=0;
+  normalcard=0;
+  rarecard=0;
+  
+  rare_comp=false;
+  normal_comp=false;
+  all_comp=false;
+  
+  $("#comp_rare").text('レアカードコンプリート：未コンプ');
+  $("#comp_normal").text('ノーマルカードコンプリート：未コンプ');
+  $("#comp_all").text('完全コンプリート：未コンプ');
+  
+  $("#simcount").text(0);
+  $("#pay").text(0);
+  $("#rarecard").text(0);
+  $("#normalcard").text(0);
+
+  $("#startbutton").attr("disabled",null);
+  $("#gacha").attr("disabled","disabled");
+  $("#auto").attr("disabled","disabled");
+  $("*[name=c_num]").attr("disabled",null);
+  $("*[name=price]").attr("disabled",null);
+  $("*[name=r_num]").attr("disabled",null);
+  $("*[name=r_pr]").attr("disabled",null);
+  $("*[name=exe]").attr("disabled",null);  
+  $("#auto").text('自動で実行！');
+  clearInterval(timerID);
+  toggle=0;
+});
+
+//戻る
+$("#cansel").click(function () {
+  $("#hid").css("display","none");
+});
+
+});
+
+function lot(){
+  //くじ処理
+  //normal-rare判定
+  simcount=simcount+1;
+  pay=pay+parseInt(price);  
+  
+  var r = Math.random() * 100;
+  if(r < r_pr){ //rare
+    var rr = (c_num-r_num) + Math.floor( Math.random() * r_num ); 
+    var t = $("#resulttable td:not(.colheader)").eq(rr).text();
+    var kaburi = (t)?'[カブリ]':'[初]';
+    t = (t)?parseInt(t)+1:1;
+    $("#resulttable td:not(.colheader)").eq(rr).text(t);
+    $("#resulttable td:not(.colheader)").eq(rr).css("background-color","#FFAAAA");
+    
+    rarecard=rarecard+1;
+    var h = '<div style="width:100%;clear:both;"><div class="log1">'+simcount+'回目</div><div class="log2">・カードNo.'+rr+'[レア]'+kaburi+'が当たりました！！</div><div class="log3">'+pay+'円</div></div>'+$("#simlogcontainer").html();
+    $("#simlogcontainer").html(h);
+    
+  }
+  else{ //normal
+    var nr = Math.floor( Math.random() * (c_num - r_num) ); 
+    var t = $("#resulttable td:not(.colheader)").eq(nr).text();
+    t = (t)?parseInt(t)+1:1;
+    $("#resulttable td:not(.colheader)").eq(nr).text(t);
+    $("#resulttable td:not(.colheader)").eq(nr).css("background-color","#CCCCFF");
+    normalcard=normalcard+1;
+  }
+
+  
+  $("#simcount").text(simcount);
+  $("#pay").text(pay);
+  $("#rarecard").text(rarecard);
+  $("#normalcard").text(normalcard);
+  
+  //コンプ判定
+  var rare_c=0;
+  var normal_c=0;
+  var all_c=0;
+  for (i = 0; i < c_num; i++) {
+    var t = $("#resulttable td:not(.colheader)").eq(i).text();
+    if(t){
+      if(c_num-r_num <= i){ //rare
+         rare_c=rare_c+1;
+      }
+      else{ //normal
+        normal_c=normal_c+1;
+      }
+      all_c=all_c+1;
+    }
+  }
+  //ログ
+  if(rare_comp === false && rare_c>=r_num){
+    var h = '<div style="width:100%;clear:both;"><div class="log1">'+simcount+'回目</div><div class="log2">・レアカードをコンプリートしました！！</div><div class="log3">'+pay+'円</div></div>'+$("#simlogcontainer").html();
+    $("#simlogcontainer").html(h);
+    $("#comp_rare").text('レアカードコンプリート：'+simcount+'回目で達成');
+    
+    rare_comp=true;
+  }
+  if(normal_comp === false && normal_c>=c_num-r_num){
+    var h = '<div style="width:100%;clear:both;"><div class="log1">'+simcount+'回目</div><div class="log2">・ノーマルカードをコンプリートしました！！</div><div class="log3">'+pay+'円</div></div>'+$("#simlogcontainer").html();
+    $("#simlogcontainer").html(h);
+    $("#comp_normal").text('ノーマルカードコンプリート：'+simcount+'回目で達成');
+    
+    normal_comp=true;
+  }
+  if(all_comp === false && all_c>=c_num){
+    var h = '<div style="width:100%;clear:both;"><div class="log1">'+simcount+'回目</div><div class="log2">・全てのカードをコンプリートしました！！</div><div class="log3">'+pay+'円</div></div>'+$("#simlogcontainer").html();
+    $("#simlogcontainer").html(h);
+    $("#comp_all").text('完全コンプリート：'+simcount+'回目で達成');
+    
+    all_comp=true;
+    
+    //timer解除
+    clearInterval(timerID);
+    
+    //twitter書き込み？
+    var m = simcount+'回目でコンプリート！！ '+pay+'円使いました。(カード'+c_num+'種/レア'+r_num+'種/レア率'+r_pr+'%/一枚'+price+'円)';
+    $("#hid").css("display","block");
+    $("#compmessage").text(m);
+    $("#tweet").html('<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://ksg.que.jp/etc/001/compgachasimulater.html" data-text="【コンプガチャシミュレッター】'+m+'" data-lang="ja">結果をツイートする</a>');
+    twttr.widgets.load();
+  }
+
+}
+
+//-->
+</script>
+
+</head>
+<body>
+<div id="hid">
+<div style="text-align:center;">コンプリート！！</div>
+<div id="compmessage"></div>
+<div id="tweet" style="float:left;">
+
+</div><button id="cansel">戻る</button>
+</div>
+
+<div id="container">
+
+<div style="font-size:12px;">
+
+<h2>コンプガチャシミュレッター<span class="kao">ヾ(＠^▽^＠)ﾉ</span></h2>
+<h3 style="background-color:#00CCFF;color:yellow;">使い方</h3>
+<div style="background:#000000;color:#FF0000;font-weight:bold;">あなたが手を出そうとしているガチャ、いったいいくらくらいでコンプできるかな？</div>
+<div>「スタート！」ボタンを押してから、「自動で実行！」ボタンを押すだけで簡単にシミュレートできます。</div>
+<h3 style="background-color:#00CCFF;color:yellow;">設定</h3>
+<div class="clear"><div class="simconfig">カード枚数</div><div class="simconfig"><input name="c_num" type=textbox value="99" style="width:30px;">種類</div><div class="simconfigmessage">※カード全体の種類数（１～１００）です。</div></div>
+<div class="clear"><div class="simconfig">一枚の値段</div><div class="simconfig"><input name="price" type=textbox value="300" style="width:30px;">円</div><div class="simconfigmessage">※カード一枚あたりの値段です。</div></div>
+<div class="clear"><div class="simconfig">レアカード枚数</div><div class="simconfig"><input name="r_num" type=textbox value="16" style="width:30px;">種類</div><div class="simconfigmessage">※レアカードの種類数（０～全体の種類数）です。</div></div>
+<div class="clear"><div class="simconfig">レアカード確率</div><div class="simconfig"><input name="r_pr" type=textbox value="5.8" style="width:30px;">％</div><div class="simconfigmessage">※レアカードがでる確率（１００－ノーマルカードが出る確率）です。</div></div>
+<div class="clear"><div class="simconfig">処理回数</div><div class="simconfig">秒間<input name="exe" type=textbox value="12" style="width:30px;">回</div><div class="simconfigmessage">※自動処理で１秒間に何回実行するかです。</div></div>
+<br>
+<div class="clear"><hr></div>
+<div class="clear" style="text-align:center;background-color:green;"><button id="startbutton">スタート！</button><button id="gacha" disabled="disabled">ガチャを引く！</button><button id="auto" disabled="disabled">自動で実行！</button><button id="clearbutton">クリアー</button><hr></div>
+<noscript>javascriptをonにしないと動きません<span class="kao">(￣∀￣)</span></noscript>
+</div>
+
+</div>
+<br>
+<div id="simcontainer">
+<div id="comp_normal" style="float:left;width:200px">ノーマルカードコンプリート：未コンプ</div><div id="comp_rare" style="float:left;width:200px">レアカードコンプリート：未コンプ</div><div id="comp_all" style="float:left;width:200px">完全コンプリート：未コンプ</div><div class="clear"><hr></div>
+<div id="simlogcontainercontainer">
+<div id="simlogheader" style="clear:both;"><div style="width:70px;float:left">回数</div><div style="width:300px;float:left">ログ</div><div style="width:100px;float:left">使った金額</div></div>
+<div id="simlogcontainer" style="clear:both;"></div>
+</div>
+<div id="simtable">
+カード入手テーブル
+<table id="resulttable">
+<tr><th></th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+<tr><td class="colheader">0X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">1X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">2X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">3X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">4X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">5X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">6X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">7X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">8X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="colheader">9X</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<br>
+<div class="clear"><div class="simconfig">試行回数</div><div id="simcount" style="float:left">0</div><div>回</div></div>
+<div class="clear"><div class="simconfig">使った金額</div><div id="pay" style="float:left">0</div><div>円</div></div>
+<div class="clear"><div class="simconfig">ノーマル枚数</div><div id="normalcard" style="float:left">0</div><div>枚</div></div>
+<div class="clear"><div class="simconfig">レア枚数</div><div id="rarecard" style="float:left">0</div><div>枚</div></div>
+</div>
+
+</div>
+
+<div id="footertext"><p>Copyright &copy; <a href="http://ksg.que.jp/">Osashimitoolz</a> 2012 - Designed by <a href="http://www.free-css-templates.com/">Free CSS Templates</a>, Thanks to <a href="http://www.openwebdesign.org/">Best Web Design</a></p>
+</div>
+
+</body>
+</html>
